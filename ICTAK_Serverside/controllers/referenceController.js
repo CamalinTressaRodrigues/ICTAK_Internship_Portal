@@ -16,8 +16,22 @@ exports.addReference = async (req, res) => {
       res.status(201).json(newMaterial);
     }
 
-exports.deleteReference = async (req, res) => {
-  const { id } = req.params;
-  await Reference.findByIdAndDelete(id);
-  res.json({ message: 'Reference material deleted' });
-}
+  exports.deleteReference = async (req, res) => {
+      try {
+        const { id } = req.params;
+        console.log(`Attempting to delete reference with ID: ${id}`);
+        if (!id) {
+          return res.status(400).json({ error: 'ID is required' });
+        }
+        const deletereference = await Reference.findByIdAndDelete(id);
+        if (!deletereference) {
+          return res.status(404).json({ error: 'Reference material not found' });
+        }
+        console.log(`Reference with ID: ${id} deleted successfully`);
+        res.json({ message: 'Reference Material deleted' });
+      } catch (error) {
+        console.error(`Error deleting Reference with ID: ${id}`, error);
+        res.status(500).json({ error: 'Error deleting reference material' });
+      }
+    };
+    

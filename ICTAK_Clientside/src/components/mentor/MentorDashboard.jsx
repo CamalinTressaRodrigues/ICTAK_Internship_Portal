@@ -113,7 +113,7 @@ export default function MentorDashboard() {
           </Box>
         </Drawer>
         <Box component="main" sx={{ flexGrow: 1, px: 3, py: 2, width: `calc(100% - ${drawerWidth}px)`, boxSizing: 'border-box', overflowX: 'hidden' }}>
-          <Toolbar />
+        <Toolbar />
           <div className="container">
             <img
               src="https://jobick.dexignlab.com/react/demo/static/media/profile1.45c723dab8349c3d75ef.jpg"

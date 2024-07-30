@@ -98,9 +98,7 @@ function App() {
              <Route path="/submissions/:projectTopic"  element={<Main child={<Submissions />} />}  />
       <Route path="/evaluate/:id" element={<Main child={<Evaluation />} />} />
       <Route path="/edit/:id" element={<Main child={<Evaluation />} />} />
-      <Route
-        path="/reference-materials"
-        element={<Main child={<ReferenceMaterial />} />}
+      <Route path="/reference-materials" element={<Main child={<ReferenceMaterial />} />}
       />
       <Route
         path="/reference-materials-form"

@@ -9,6 +9,7 @@ const submissionSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  
   topic: {
     type: String,
     required: true
@@ -23,8 +24,7 @@ const submissionSchema = new mongoose.Schema({
   },
   marks: {
     type: Number,
-    required: true,
-    default: 0 // Default value can be adjusted as needed
+      default: 0 // Default value can be adjusted as needed
   },
   comments: {
     type: String,

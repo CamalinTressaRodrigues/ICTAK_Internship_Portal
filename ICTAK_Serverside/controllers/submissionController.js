@@ -62,14 +62,13 @@ exports.evaluateSubmission = async (req, res) => {
       return res.status(400).json({ msg: 'Submission already evaluated' });
     }
 
-    // submission.marks = marks;
-    // submission.comments = comments;
-    // submission.evaluationStatus = true; // Set evaluationStatus to completed
-    if (marks !== undefined ) {
-      submission.marks = marks;
-      submission.comments = comments;
-      submission.evaluationStatus = true; // Set evaluationStatus to completed if marks and comments are provided
+    if (!marks) {
+      return res.status(400).json({ msg: 'Marks cannot be empty!' });
     }
+
+    submission.marks = marks;
+    submission.comments = comments;
+    submission.evaluationStatus = true; // Set evaluationStatus to completed
 
     await submission.save();
     res.json(submission);
@@ -78,6 +77,7 @@ exports.evaluateSubmission = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
 
 // New function to get a single submission by ID
 exports.getSubmissionById = async (req, res) => {

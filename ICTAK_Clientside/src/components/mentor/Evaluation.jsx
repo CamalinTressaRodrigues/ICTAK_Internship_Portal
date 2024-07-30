@@ -42,6 +42,7 @@ export default function ClippedDrawer() {
   const [comments, setComments] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [backendError, setBackendError] = useState(''); // State to handle backend errors
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -86,6 +87,11 @@ export default function ClippedDrawer() {
       navigate(`/submissions/${submission?.projectTopic}`);
     } catch (error) {
       console.error('Error evaluating or updating submission:', error);
+      if (error.response && error.response.data && error.response.data.msg) {
+        setBackendError(error.response.data.msg); // Set backend error message
+      } else {
+        setBackendError('An unexpected error occurred.');
+      }
     }
   };
 
@@ -99,9 +105,9 @@ export default function ClippedDrawer() {
         <Drawer
           variant="permanent"
           sx={{
-            width: drawerWidth,
+            width: { xs: '100%', sm: drawerWidth },
             flexShrink: 0,
-            [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+            [`& .MuiDrawer-paper`]: { width: { xs: '100%', sm: drawerWidth }, boxSizing: 'border-box' },
             backgroundColor: '#fff'
           }}
         >
@@ -140,20 +146,20 @@ export default function ClippedDrawer() {
             <Divider />
           </Box>
         </Drawer>
-        <Box component="main" sx={{ flexGrow: 1, marginTop:'35px ', width: `calc(100% - ${drawerWidth}px)`, boxSizing: 'border-box', overflowX: 'hidden' }}>
+        <Box component="main" sx={{ flexGrow: 1, marginTop: '35px', width: { xs: '100%', sm: `calc(100% - ${drawerWidth}px)` }, boxSizing: 'border-box', overflowX: 'hidden' }}>
           <Toolbar />
           <Typography className="project-head" sx={{ paddingLeft: 4 }}>
             <h6>Topic:</h6>
           </Typography>
           <Typography sx={{ display: 'flex', justifyContent: 'flex-start', marginTop: 2, paddingLeft: 4 }}>
-          {submission?.projectTopic}
+            {submission?.projectTopic}
           </Typography>
           <div style={{ position: 'relative', marginLeft: 30, marginTop: 20 }}>
             <Typography className="project-head">
               <h6>Submission:</h6>
             </Typography>
             <TextField
-            style={{ marginBottom: '30px', marginTop: 20 }}
+              style={{ marginBottom: '30px', marginTop: 20 }}
               className="textField"
               disabled
               id="outlined"
@@ -162,14 +168,12 @@ export default function ClippedDrawer() {
               variant="outlined"
               multiline
               rows={5}
-              
             />
           </div>
-          <div style={{ marginTop: 20, marginBottom:30, paddingLeft:30 }}>
+          <div style={{ marginTop: 20, marginBottom: 30, paddingLeft: 30 }}>
             <Grid container spacing={1}>
-              <Grid item xs={4} md={4} sm={4}>
+              <Grid item xs={12} md={4} sm={6}>
                 <TextField
-                  required
                   fullWidth
                   id="outlined-basic"
                   label="Mark"
@@ -179,9 +183,8 @@ export default function ClippedDrawer() {
                   onChange={(e) => setMarks(e.target.value)}
                 />
               </Grid>
-              <Grid item xs={8} md={8} sm={8} lg={7.3}>
+              <Grid item xs={12} md={8} sm={6}>
                 <TextField
-                  required
                   fullWidth
                   id="outlined-basic"
                   label="Comments"
@@ -192,6 +195,7 @@ export default function ClippedDrawer() {
               </Grid>
             </Grid>
           </div>
+          {backendError && <span style={{ color: 'red', paddingLeft: '30px' }}>{backendError}</span>} {/* Display backend error */}
           <div className="button-container" style={{ padding: 2, display: 'flex', justifyContent: 'center' }}>
             <Button
               variant="contained"
