@@ -121,27 +121,6 @@ const MentorsList = () => {
     setErrors({ ...errors, projectTopics: false });
   };
 
-  // const handleAdd = async () => {
-  //   if (
-  //     !newMentor.name ||
-  //     !newMentor.email ||
-  //     !newMentor.phone ||
-  //     !newMentor.password ||
-  //     !newMentor.projectTopics.length
-  //   ) {
-  //     alert('Please fill in all fields.');
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await axiosInstance.post('/admin/addmentor', newMentor);
-  //     setData([...data, response.data]);
-  //     handleCloseAddDialog();
-  //   } catch (error) {
-  //     console.error('Error adding Mentor:', error);
-  //   }
-  // };
-
 
   const handleAdd = async () => {
       if (
@@ -182,11 +161,6 @@ const MentorsList = () => {
       );
     }
   };
-  
-  // const handleOpenUpdateDialog = (mentor) => {
-  //   setMentorUpdate(mentor);
-  //   setOpenUpdate(true);
-  // };
 
   const handleOpenUpdateDialog = (mentor) => {
     setMentorUpdate({
@@ -195,7 +169,6 @@ const MentorsList = () => {
     });
     setOpenUpdate(true);
   };
-
 
 
   const handleCloseUpdateDialog = () => {

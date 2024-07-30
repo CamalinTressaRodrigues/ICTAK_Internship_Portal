@@ -29,21 +29,12 @@ const MentorsList = async (req, res) => {
 // Add a new mentor
 const AddMentors = async (req, res) => {
   try {
-    // Get the project  topics and password from the request body
+    // Get the project  topics from the request body
     const topics = req.body.projectTopics;
     // const password = req.body.password;
 
     const { name, email, phone, password } = req.body;
-    // Fetch projects with the given topics
-    const projects = await Project.find({ topic: { $in: topics } });
 
-    // Check if all topics are valid
-    if (topics.length !== projects.length) {
-      const invalidTopics = topics.filter(topic =>
-        !projects.some(project => project.topic === topic)
-      );
-      return res.status(400).json({ message: 'Invalid project topics', invalidTopics });
-    }
     // Validate all fields
     if (!name || !email || !phone || !password || !topics) {
       return res.status(400).json({ message: 'All fields are mandatory.' });
@@ -58,25 +49,17 @@ const AddMentors = async (req, res) => {
     }
 
     // Fetch projects with the given topics
-    // const projects = await Project.find({ topic: { $in: topics } });
+    const projects = await Project.find({ topic: { $in: topics } });
 
-    // // Check if all topics are valid
-    // if (topics.length !== projects.length) {
-    //   const invalidTopics = topics.filter(topic =>
-    //     !projects.some(project => project.topic === topic)
-    //   );
-    //   return res.status(400).json({ message: 'Invalid project topics', invalidTopics });
-    // }
+    // Check if all topics are valid
+    if (topics.length !== projects.length) {
+      const invalidTopics = topics.filter(topic =>
+        !projects.some(project => project.topic === topic)
+      );
+      return res.status(400).json({ message: 'Invalid project topics', invalidTopics });
+    }
 
     // Prepare new mentor data
-    // const newMentor = {
-    //   name: req.body.name,
-    //   email: req.body.email,
-    //   phone: req.body.phone,
-    //   password: req.body.password,
-    //   projectTopics: topics // Store topics directly as strings
-    // };
-
     const newMentor = {
       name,
       email,

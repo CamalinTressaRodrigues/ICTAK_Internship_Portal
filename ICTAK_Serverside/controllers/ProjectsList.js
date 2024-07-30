@@ -29,18 +29,6 @@ const addProject = async (req, res) => {
 }
 }
 
-// const updateProject = async (req, res) => {
-//     try{
-//         const project = await projlist.findByIdAndUpdate( req.params._id,req.body, {new:true});
-//         res.status(200).json(project);
-//         if (!project)
-//         return res.status(404).json({ message: 'Project not found' });
-//     }
-//     catch (error) {
-//         console.log(error);
-//         res.status(500).json({error:'Internal server error'})
-//     }
-// }
 const updateProject = async (req, res) => {
   try {
     const project = await projlist.findByIdAndUpdate(

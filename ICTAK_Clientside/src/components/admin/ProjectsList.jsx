@@ -270,15 +270,6 @@ const ProjectsList = () => {
               value={newProject.topic}
               onChange={handleAddInputChange}
             />
-            {/* <TextField
-              margin="dense"
-              name="stack"
-              label="Stack"
-              type="text"
-              fullWidth
-              value={newProject.stack}
-              onChange={handleAddInputChange}
-            /> */}
             <TextField
               margin="dense"
               name="duration"
@@ -312,15 +303,6 @@ const ProjectsList = () => {
               value={updateProject?.topic || ''}
               onChange={handleUpdateInputChange}
             />
-            {/* <TextField
-              margin="dense"
-              name="stack"
-              label="Stack"
-              type="text"
-              fullWidth
-              value={updateProject?.stack || ''}
-              onChange={handleUpdateInputChange}
-            /> */}
             <TextField
               margin="dense"
               name="duration"
