@@ -48,6 +48,13 @@ const MentorsList = () => {
   const [updateMentor, setMentorUpdate] = useState(null);
   const [openUpdate, setOpenUpdate] = useState(false);
   
+    const [errors, setErrors] = useState({
+      name: false,
+      email: false,
+      phone: false,
+      password: false,
+      projectTopics: false,
+    });
 
   useEffect(() => {
     // Fetch the list of mentors
@@ -91,11 +98,19 @@ const MentorsList = () => {
       projectTopics: [],
     });
     setOpenAdd(false);
+    setErrors({
+      name: false,
+      email: false,
+      phone: false,
+      password: false,
+      projectTopics: false,
+    });
   };
 
   const handleAddInputChange = (e) => {
     const { name, value } = e.target;
     setNewMentor({ ...newMentor, [name]: value });
+    setErrors({ ...errors, [name]: false });
   };
 
   const handleAutocompleteChange = (event, newValue) => {
@@ -103,6 +118,7 @@ const MentorsList = () => {
       ...newMentor,
       projectTopics: newValue.map((topic) => topic.topic), // Store topics directly as strings
     });
+    setErrors({ ...errors, projectTopics: false });
   };
 
   // const handleAdd = async () => {
@@ -126,10 +142,61 @@ const MentorsList = () => {
   //   }
   // };
 
+
+  const handleAdd = async () => {
+      if (
+        !newMentor.name ||
+        !newMentor.email ||
+        !newMentor.phone ||
+        !newMentor.password ||
+        !newMentor.projectTopics.length
+      ) {
+        alert('Please fill in all fields.');
+        return;
+      }
+
+    const newErrors = {
+      name: !newMentor.name,
+      email: !newMentor.email,
+      phone: !newMentor.phone || !/^\d{10}$/.test(newMentor.phone),
+      password: !newMentor.password || newMentor.password.length < 8,
+      projectTopics: !newMentor.projectTopics.length,
+    };
+
+    setErrors(newErrors);
+
+    if (Object.values(newErrors).some((error) => error)) {
+      alert('Please fill in all fields correctly.');
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.post('/admin/addmentor', newMentor);
+      setData([...data, response.data]);
+      handleCloseAddDialog();
+    } catch (error) {
+      console.error('Error adding Mentor:', error);
+      alert(
+        error.response?.data?.message ||
+          'An error occurred while adding the mentor.'
+      );
+    }
+  };
+  
+  // const handleOpenUpdateDialog = (mentor) => {
+  //   setMentorUpdate(mentor);
+  //   setOpenUpdate(true);
+  // };
+
   const handleOpenUpdateDialog = (mentor) => {
-    setMentorUpdate(mentor);
+    setMentorUpdate({
+      ...mentor,
+      password: '', // Leave the password field blank or set to a placeholder
+    });
     setOpenUpdate(true);
   };
+
+
 
   const handleCloseUpdateDialog = () => {
     setMentorUpdate(null);
@@ -149,16 +216,50 @@ const MentorsList = () => {
   };
 
   const handleUpdate = async () => {
+    const updatedErrors = {
+      name: !updateMentor.name,
+      email: !updateMentor.email,
+      phone: !updateMentor.phone || !/^\d{10}$/.test(updateMentor.phone),
+      password: updateMentor.password && updateMentor.password.length < 8,
+      projectTopics: !updateMentor.projectTopics.length,
+    };
+
+    setErrors(updatedErrors);
+
+    if (Object.values(updatedErrors).some((error) => error)) {
+      alert('Please correct the errors and fill in all fields.');
+      return;
+    }
+
+    // Prepare the data to send in the update request
+    const updateData = {
+      name: updateMentor.name,
+      email: updateMentor.email,
+      phone: updateMentor.phone,
+      projectTopics: updateMentor.projectTopics,
+    };
+
+   
+    // Include the password in the request payload only if it's provided and valid
+    if (updateMentor.password && updateMentor.password.length >= 8) {
+        updateData.password = updateMentor.password;
+      }
+      console.log('Update Data:', updateData);
+
     try {
       await axiosInstance.patch(
         `/admin/updatementor/${updateMentor._id}`,
-        updateMentor
+        updateData
       );
       const res = await axiosInstance.get('/admin/mentorslist');
       setData(res.data);
       handleCloseUpdateDialog();
     } catch (error) {
       console.error('Error updating Mentor:', error);
+      alert(
+        error.response?.data?.message ||
+          'An error occurred while updating the mentor.'
+      );
     }
   };
 
@@ -175,43 +276,6 @@ const MentorsList = () => {
       }
     }
   };
-
-
-  //error
-  const [errors, setErrors] = useState({
-    name: false,
-    email: false,
-    phone: false,
-    password: false,
-    projectTopics: false,
-  });
-  
-  const handleAdd = async () => {
-    const newErrors = {
-      name: !newMentor.name,
-      email: !newMentor.email,
-      phone: !newMentor.phone,
-      password: !newMentor.password,
-      projectTopics: !newMentor.projectTopics.length,
-    };
-  
-    setErrors(newErrors);
-  
-    if (Object.values(newErrors).includes(true)) {
-      alert('Please fill in all fields.');
-      return;
-    }
-  
-    try {
-      const response = await axiosInstance.post('/admin/addmentor', newMentor);
-      setData([...data, response.data]);
-      handleCloseAddDialog();
-    } catch (error) {
-      console.error('Error adding Mentor:', error);
-    }
-  };
-  
-
 
   return (
     <Box
@@ -266,7 +330,6 @@ const MentorsList = () => {
               ))}
             </List>
           </Link>
-
           <Divider />
         </Box>
       </Drawer>
@@ -339,13 +402,18 @@ const MentorsList = () => {
                 margin="dense"
                 name="name"
                 label="Name"
+                type="text"
                 fullWidth
                 variant="standard"
                 value={newMentor.name}
                 onChange={handleAddInputChange}
+                error={errors.name}
+                helperText={errors.name ? 'Name is required.' : ''}
                 sx={{
                   '& .MuiInputBase-root': {
-                    borderBottom: errors.name ? '1px solid red' : '1px solid #ccc',
+                    borderBottom: errors.name
+                      ? '1px solid red'
+                      : '1px solid #ccc',
                   },
                 }}
               />
@@ -360,9 +428,13 @@ const MentorsList = () => {
                 onChange={handleAddInputChange}
                 sx={{
                   '& .MuiInputBase-root': {
-                    borderBottom: errors.name ? '1px solid red' : '1px solid #ccc',
+                    borderBottom: errors.name
+                      ? '1px solid red'
+                      : '1px solid #ccc',
                   },
                 }}
+                error={errors.email}
+                helperText={errors.email ? 'Email is required.' : ''}
               />
               <TextField
                 margin="dense"
@@ -375,9 +447,15 @@ const MentorsList = () => {
                 onChange={handleAddInputChange}
                 sx={{
                   '& .MuiInputBase-root': {
-                    borderBottom: errors.name ? '1px solid red' : '1px solid #ccc',
+                    borderBottom: errors.name
+                      ? '1px solid red'
+                      : '1px solid #ccc',
                   },
                 }}
+                error={errors.phone}
+                helperText={
+                  errors.phone ? 'Phone number must be exactly 10 digits.' : ''
+                }
               />
               <TextField
                 margin="dense"
@@ -390,9 +468,17 @@ const MentorsList = () => {
                 onChange={handleAddInputChange}
                 sx={{
                   '& .MuiInputBase-root': {
-                    borderBottom: errors.name ? '1px solid red' : '1px solid #ccc',
+                    borderBottom: errors.name
+                      ? '1px solid red'
+                      : '1px solid #ccc',
                   },
                 }}
+                error={errors.password}
+                helperText={
+                  errors.password
+                    ? 'Password must be at least 8 characters long, include one uppercase letter, one number, and one special symbol.'
+                    : ''
+                }
               />
               <Autocomplete
                 multiple
@@ -406,7 +492,9 @@ const MentorsList = () => {
                     variant="standard"
                     sx={{
                       '& .MuiInputBase-root': {
-                        borderBottom: errors.name ? '1px solid red' : '1px solid #ccc',
+                        borderBottom: errors.name
+                          ? '1px solid red'
+                          : '1px solid #ccc',
                       },
                     }}
                   />
@@ -434,9 +522,13 @@ const MentorsList = () => {
                 onChange={handleUpdateInputChange}
                 sx={{
                   '& .MuiInputBase-root': {
-                    borderBottom: errors.name ? '1px solid red' : '1px solid #ccc',
+                    borderBottom: errors.name
+                      ? '1px solid red'
+                      : '1px solid #ccc',
                   },
                 }}
+                error={errors.name}
+                helperText={errors.name ? 'Name is required.' : ''}
               />
               <TextField
                 margin="dense"
@@ -449,9 +541,13 @@ const MentorsList = () => {
                 onChange={handleUpdateInputChange}
                 sx={{
                   '& .MuiInputBase-root': {
-                    borderBottom: errors.name ? '1px solid red' : '1px solid #ccc',
+                    borderBottom: errors.name
+                      ? '1px solid red'
+                      : '1px solid #ccc',
                   },
                 }}
+                error={errors.email}
+                helperText={errors.email ? 'Email is required.' : ''}
               />
               <TextField
                 margin="dense"
@@ -464,9 +560,15 @@ const MentorsList = () => {
                 onChange={handleUpdateInputChange}
                 sx={{
                   '& .MuiInputBase-root': {
-                    borderBottom: errors.name ? '1px solid red' : '1px solid #ccc',
+                    borderBottom: errors.name
+                      ? '1px solid red'
+                      : '1px solid #ccc',
                   },
                 }}
+                error={errors.phone}
+                helperText={
+                  errors.phone ? 'Phone number must be exactly 10 digits.' : ''
+                }
               />
               <TextField
                 margin="dense"
@@ -477,11 +579,20 @@ const MentorsList = () => {
                 variant="standard"
                 value={updateMentor?.password || ''}
                 onChange={handleUpdateInputChange}
+                placeholder="Leave blank to keep current password"
                 sx={{
                   '& .MuiInputBase-root': {
-                    borderBottom: errors.name ? '1px solid red' : '1px solid #ccc',
+                    borderBottom: errors.name
+                      ? '1px solid red'
+                      : '1px solid #ccc',
                   },
                 }}
+                error={errors.password}
+                helperText={
+                  errors.password
+                    ? 'Password must be at least 8 characters long, include one uppercase letter, one number, and one special symbol.'
+                    : ''
+                }
               />
               <Autocomplete
                 multiple
@@ -498,7 +609,9 @@ const MentorsList = () => {
                     variant="standard"
                     sx={{
                       '& .MuiInputBase-root': {
-                        borderBottom: errors.name ? '1px solid red' : '1px solid #ccc',
+                        borderBottom: errors.name
+                          ? '1px solid red'
+                          : '1px solid #ccc',
                       },
                     }}
                   />
