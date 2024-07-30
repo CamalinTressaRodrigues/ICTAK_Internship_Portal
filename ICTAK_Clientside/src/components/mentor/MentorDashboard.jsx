@@ -123,7 +123,7 @@ export default function MentorDashboard() {
             <div className="content">
               <div className="profile-pic">
                 <img
-                  src="https://media.istockphoto.com/id/1437816897/photo/business-woman-manager-or-human-resources-portrait-for-career-success-company-we-are-hiring.jpg?s=612x612&w=0&k=20&c=tyLvtzutRh22j9GqSGI33Z4HpIwv9vL_MZw_xOE19NQ="
+                  src="https://photosly.net/wp-content/uploads/2023/12/no-dp32.jpg"
                   alt="Employee Profile"
                   className="profile-image"
                 />
