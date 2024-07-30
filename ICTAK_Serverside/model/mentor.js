@@ -15,17 +15,12 @@ const mentorSchema = new Schema({
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   phone: {
     type: Number,
-    required: true
+    required: true,
   },
-  // projectTopic: {
-  //   type: [String], // Changed to an array of strings
-  //   required: true
-  // }
-  // projectTopics: [{ type: mongoose.Schema.Types.ObjectId, ref: 'project' }],
    projectTopics: [String] // Store topics as strings
 });
 
